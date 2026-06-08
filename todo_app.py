@@ -11,8 +11,8 @@ USER_DB = {
 
 def login():
     st.sidebar.title("Login")
-    username = st.sidebar.text_input("Username")
-    password = st.sidebar.text_input("Password", type="password")
+    username = st.sidebar.text_input("User")
+    password = st.sidebar.text_input("1234", type="password")
     
     if st.sidebar.button("Login"):
         if username in USER_DB and USER_DB[username] == password:
