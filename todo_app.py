@@ -3,47 +3,38 @@ import pandas as pd
 import os
 from datetime import datetime
 
-# --- ส่วนของการ Login ---
-# จำลองฐานข้อมูลผู้ใช้ (แนะนำ: เก็บใน st.secrets ในอนาคต)
+# จำลองฐานข้อมูลผู้ใช้ (ในอนาคตควรย้ายไปเก็บในไฟล์หรือ Database)
 USER_DB = {
-    "admin": "username",
-    "user1": "password"
+    "admin": "admin123",
+    "user1": "user1234"
 }
 
 def login():
-    st.sidebar.title("🔐 Login")
-    # ใช้ key เพื่อให้การ input แยกส่วนกันชัดเจน
-    username_input = st.sidebar.text_input("Username")
-    password_input = st.sidebar.text_input("Password", type="password")
+    st.sidebar.title("Login")
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type="password")
     
     if st.sidebar.button("Login"):
-        # ตรวจสอบชื่อผู้ใช้และรหัสผ่าน
-        if username_input in USER_DB and USER_DB[username_input] == password_input:
+        if username in USER_DB and USER_DB[username] == password:
             st.session_state['logged_in'] = True
-            st.session_state['username'] = username_input
-            st.rerun() # สั่งรันใหม่เพื่อเข้าสู่หน้าหลัก
+            st.session_state['username'] = username
+            st.rerun()
         else:
-            st.sidebar.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+            st.sidebar.error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
 
-# ตรวจสอบว่าเคย Login ไว้หรือยัง
+# ตรวจสอบสถานะการ Login
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
 
-# ถ้ายังไม่ได้ Login ให้เรียกฟังก์ชัน login() และหยุดการทำงานส่วนอื่น
 if not st.session_state['logged_in']:
     login()
-    st.stop() 
+    st.stop()  # หยุดการทำงานส่วนอื่นของแอปไว้จนกว่าจะ Login ผ่าน
+else:
+    st.sidebar.write(f"ยินดีต้อนรับ, {st.session_state['username']}!")
+    if st.sidebar.button("Logout"):
+        st.session_state['logged_in'] = False
+        st.rerun()
 
-# --- หากผ่านการ Login แล้ว ให้แสดงส่วนนี้ ---
-st.sidebar.success(f"สวัสดีคุณ: {st.session_state['username']}")
-if st.sidebar.button("Logout"):
-    st.session_state['logged_in'] = False
-    st.rerun()
-
-# --- โค้ดแอปหลัก ---
-# (ใส่โค้ดจัดการงานของคุณต่อจากตรงนี้ได้เลย)
-st.title("ระบบจัดการรายการงาน")
-st.write("ยินดีต้อนรับเข้าสู่ระบบจัดการงาน")
 # --- โค้ดแอปหลักของคุณเริ่มตรงนี้ ---
 st.title("ระบบจัดการรายการงาน")
 st.write("คุณสามารถใช้งานแอปได้แล้วตอนนี้!")
@@ -81,7 +72,6 @@ with st.expander("➕ เพิ่มงานใหม่", expanded=True):
 # 2. ค้นหา
 search = st.text_input("🔍 ค้นหาชื่อรายการ:")
 if search:
-    # ค้นหาแบบกรองข้อมูลแต่ยังรักษา Index เดิมไว้เพื่อลบ
     display_df = df[df['Task'].str.contains(search, case=False, na=False)]
 else:
     display_df = df
@@ -90,7 +80,6 @@ st.write("---")
 
 # 3. แสดงรายการ
 for i, row in display_df.iterrows():
-    # แบ่งคอลัมน์: [ปุ่มเสร็จ] [ชื่อ] [วันที่] [ขั้นตอน] [ปุ่มลบ]
     col1, col2, col3, col4, col5 = st.columns([0.8, 2, 1, 1.5, 0.8])
     
     # ปุ่มทำเสร็จ
@@ -113,7 +102,7 @@ for i, row in display_df.iterrows():
         df.to_csv(DATA_FILE, index=False)
         st.rerun()
 
-    # ปุ่มลบรายการ (ใหม่)
+    # ปุ่มลบรายการ
     if col5.button("🗑️", key=f"del_{i}"):
         df = df.drop(index=i)
         df.to_csv(DATA_FILE, index=False)
