@@ -5,14 +5,14 @@ from datetime import datetime
 
 # จำลองฐานข้อมูลผู้ใช้ (ในอนาคตควรย้ายไปเก็บในไฟล์หรือ Database)
 USER_DB = {
-    "admin": "user",
-    "user1": "1234"
+    "admin": "username",
+    "user1": "password"
 }
 
 def login():
     st.sidebar.title("Login")
-    username = st.sidebar.text_input("User")
-    password = st.sidebar.text_input("1234", type="password")
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("password", type="password")
     
     if st.sidebar.button("Login"):
         if username in USER_DB and USER_DB[username] == password:
