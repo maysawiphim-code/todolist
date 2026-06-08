@@ -3,37 +3,6 @@ import pandas as pd
 import os
 from datetime import datetime
 
-# จำลองฐานข้อมูลผู้ใช้ (ในอนาคตควรย้ายไปเก็บในไฟล์หรือ Database)
-USER_DB = {
-    "admin": "admin123",
-    "user1": "user1234"
-}
-
-def login():
-    st.sidebar.title("Login")
-    username = st.sidebar.text_input("Username")
-    password = st.sidebar.text_input("Password", type="password")
-    
-    if st.sidebar.button("Login"):
-        if username in USER_DB and USER_DB[username] == password:
-            st.session_state['logged_in'] = True
-            st.session_state['username'] = username
-            st.rerun()
-        else:
-            st.sidebar.error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
-
-# ตรวจสอบสถานะการ Login
-if 'logged_in' not in st.session_state:
-    st.session_state['logged_in'] = False
-
-if not st.session_state['logged_in']:
-    login()
-    st.stop()  # หยุดการทำงานส่วนอื่นของแอปไว้จนกว่าจะ Login ผ่าน
-else:
-    st.sidebar.write(f"ยินดีต้อนรับ, {st.session_state['username']}!")
-    if st.sidebar.button("Logout"):
-        st.session_state['logged_in'] = False
-        st.rerun()
 
 # --- โค้ดแอปหลักของคุณเริ่มตรงนี้ ---
 st.title("ระบบจัดการรายการงาน")
