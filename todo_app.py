@@ -3,38 +3,47 @@ import pandas as pd
 import os
 from datetime import datetime
 
-# จำลองฐานข้อมูลผู้ใช้ (ในอนาคตควรย้ายไปเก็บในไฟล์หรือ Database)
+# --- ส่วนของการ Login ---
+# จำลองฐานข้อมูลผู้ใช้ (แนะนำ: เก็บใน st.secrets ในอนาคต)
 USER_DB = {
     "admin": "username",
     "user1": "password"
 }
 
 def login():
-    st.sidebar.title("Login")
-    username = st.sidebar.text_input("Username")
-    password = st.sidebar.text_input("password", type="password")
+    st.sidebar.title("🔐 Login")
+    # ใช้ key เพื่อให้การ input แยกส่วนกันชัดเจน
+    username_input = st.sidebar.text_input("Username")
+    password_input = st.sidebar.text_input("Password", type="password")
     
     if st.sidebar.button("Login"):
-        if username in USER_DB and USER_DB[username] == password:
+        # ตรวจสอบชื่อผู้ใช้และรหัสผ่าน
+        if username_input in USER_DB and USER_DB[username_input] == password_input:
             st.session_state['logged_in'] = True
-            st.session_state['username'] = username
-            st.rerun()
+            st.session_state['username'] = username_input
+            st.rerun() # สั่งรันใหม่เพื่อเข้าสู่หน้าหลัก
         else:
-            st.sidebar.error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
+            st.sidebar.error("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง")
 
-# ตรวจสอบสถานะการ Login
+# ตรวจสอบว่าเคย Login ไว้หรือยัง
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
 
+# ถ้ายังไม่ได้ Login ให้เรียกฟังก์ชัน login() และหยุดการทำงานส่วนอื่น
 if not st.session_state['logged_in']:
     login()
-    st.stop()  # หยุดการทำงานส่วนอื่นของแอปไว้จนกว่าจะ Login ผ่าน
-else:
-    st.sidebar.write(f"ยินดีต้อนรับ, {st.session_state['username']}!")
-    if st.sidebar.button("Logout"):
-        st.session_state['logged_in'] = False
-        st.rerun()
+    st.stop() 
 
+# --- หากผ่านการ Login แล้ว ให้แสดงส่วนนี้ ---
+st.sidebar.success(f"สวัสดีคุณ: {st.session_state['username']}")
+if st.sidebar.button("Logout"):
+    st.session_state['logged_in'] = False
+    st.rerun()
+
+# --- โค้ดแอปหลัก ---
+# (ใส่โค้ดจัดการงานของคุณต่อจากตรงนี้ได้เลย)
+st.title("ระบบจัดการรายการงาน")
+st.write("ยินดีต้อนรับเข้าสู่ระบบจัดการงาน")
 # --- โค้ดแอปหลักของคุณเริ่มตรงนี้ ---
 st.title("ระบบจัดการรายการงาน")
 st.write("คุณสามารถใช้งานแอปได้แล้วตอนนี้!")
